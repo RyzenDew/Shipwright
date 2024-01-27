@@ -107,7 +107,9 @@ void KaleidoScopeCall_Update(PlayState* play) {
 
             if (gKaleidoMgrCurOvl == kaleidoScopeOvl) 
             {
-                sKaleidoScopeUpdateFunc(play);
+                if (gIsLogicFrame) {
+                    sKaleidoScopeUpdateFunc(play); // TODO
+                }
 
                 if ((play->pauseCtx.state == 0) && (play->pauseCtx.debugState == 0)) {
                     osSyncPrintf(VT_FGCOL(GREEN));

@@ -1022,7 +1022,7 @@ void Play_Update(PlayState* play) {
                         gSaveContext.entranceIndex = play->nextEntranceIndex;
                         play->sceneLoadFlag = 0;
                         play->transitionMode = 0;
-                    } else {
+                    } else if (gIsLogicFrame) {
                         D_801614C8++;
                     }
                     break;
@@ -1035,7 +1035,7 @@ void Play_Update(PlayState* play) {
                         play->sceneLoadFlag = 0;
                         play->transitionMode = 0;
                         play->envCtx.fillScreen = false;
-                    } else {
+                    } else if (gIsLogicFrame) {
                         D_801614C8++;
                     }
                     break;
@@ -1206,7 +1206,9 @@ void Play_Update(PlayState* play) {
                     LOG_NUM("1", 1);
                 }
 
-                play->gameplayFrames++;
+                if (gIsLogicFrame) {
+                    play->gameplayFrames++; // TODO float
+                }
                 // Gameplay stat tracking
                 if (!gSaveContext.sohStats.gameComplete &&
                     (!IS_BOSS_RUSH || !gSaveContext.isBossRushPaused)) {
@@ -1221,7 +1223,9 @@ void Play_Update(PlayState* play) {
 
                 func_800AA178(1);
 
-                if (play->actorCtx.freezeFlashTimer && (play->actorCtx.freezeFlashTimer-- < 5)) {
+                if (play->actorCtx.freezeFlashTimer &&
+                    ((gIsLogicFrame ? play->actorCtx.freezeFlashTimer-- : play->actorCtx.freezeFlashTimer) <
+                     5)) {
                     osSyncPrintf("FINISH=%d\n", play->actorCtx.freezeFlashTimer);
                     if ((play->actorCtx.freezeFlashTimer > 0) &&
                         ((play->actorCtx.freezeFlashTimer % 2) != 0)) {
@@ -1268,32 +1272,42 @@ void Play_Update(PlayState* play) {
                     }
 
                     if (play->unk_11DE9 == 0) {
-                        Actor_UpdateAll(play, &play->actorCtx);
+                        //if (gIsLogicFrame) {
+                            Actor_UpdateAll(play, &play->actorCtx); // TODO
+                        //}
                     }
 
                     if (1 && HREG(63)) {
                         LOG_NUM("1", 1);
                     }
 
-                    func_80064558(play, &play->csCtx);
+                    if (gIsLogicFrame) {
+                        func_80064558(play, &play->csCtx); // TODO
+                    }
 
                     if (1 && HREG(63)) {
                         LOG_NUM("1", 1);
                     }
 
-                    func_800645A0(play, &play->csCtx);
+                    if (gIsLogicFrame) {
+                        func_800645A0(play, &play->csCtx); // TODO
+                    }
 
                     if (1 && HREG(63)) {
                         LOG_NUM("1", 1);
                     }
 
-                    Effect_UpdateAll(play);
+                    if (gIsLogicFrame) {
+                        Effect_UpdateAll(play); // TODO
+                    }
 
                     if (1 && HREG(63)) {
                         LOG_NUM("1", 1);
                     }
 
-                    EffectSs_UpdateAll(play);
+                    if (gIsLogicFrame) {
+                        EffectSs_UpdateAll(play); // TODO
+                    }
 
                     if (1 && HREG(63)) {
                         LOG_NUM("1", 1);
@@ -1363,7 +1377,9 @@ void Play_Update(PlayState* play) {
                     LOG_NUM("1", 1);
                 }
 
-                Message_Update(play);
+                if (gIsLogicFrame) {
+                    Message_Update(play); // TODO
+                }
             }
 
             if (1 && HREG(63)) {
@@ -1374,7 +1390,9 @@ void Play_Update(PlayState* play) {
                 LOG_NUM("1", 1);
             }
 
-            Interface_Update(play);
+            if (gIsLogicFrame) {
+                Interface_Update(play); // TODO
+            }
 
             if (1 && HREG(63)) {
                 LOG_NUM("1", 1);
@@ -1392,13 +1410,17 @@ void Play_Update(PlayState* play) {
                 LOG_NUM("1", 1);
             }
 
-            ShrinkWindow_Update(R_UPDATE_RATE);
+            if (gIsLogicFrame) {
+                ShrinkWindow_Update(R_UPDATE_RATE); // TODO
+            }
 
             if (1 && HREG(63)) {
                 LOG_NUM("1", 1);
             }
 
-            TransitionFade_Update(&play->transitionFade, R_UPDATE_RATE);
+            if (gIsLogicFrame) {
+                TransitionFade_Update(&play->transitionFade, R_UPDATE_RATE); // TODO
+            }
         } else {
             goto skip;
         }
@@ -1444,8 +1466,11 @@ skip:
         LOG_NUM("1", 1);
     }
 
-    Environment_Update(play, &play->envCtx, &play->lightCtx, &play->pauseCtx, &play->msgCtx,
-                       &play->gameOverCtx, play->state.gfxCtx);
+    if (gIsLogicFrame) {
+        // TODO
+        Environment_Update(play, &play->envCtx, &play->lightCtx, &play->pauseCtx,
+                           &play->msgCtx, &play->gameOverCtx, play->state.gfxCtx);
+    }
 
     if (IS_RANDO) {
         GivePlayerRandoRewardSariaGift(play, RC_LW_GIFT_FROM_SARIA);

@@ -18,6 +18,8 @@
 #include "Enhancements/randomizer/randomizer.h"
 #include <vector>
 
+extern "C" int gIsLogicFrame;
+
 const std::string customMessageTableID = "BaseGameOverrides";
 const std::string appShortName = "soh";
 
@@ -63,6 +65,8 @@ uint32_t IsGameMasterQuest();
 #endif
 
 #ifndef __cplusplus
+extern int gIsLogicFrame;
+
     void InitOTR(void);
 void DeinitOTR(void);
 void VanillaItemTable_Init();

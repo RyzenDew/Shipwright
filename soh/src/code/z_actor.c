@@ -1070,12 +1070,12 @@ void TitleCard_Update(PlayState* play, TitleCardContext* titleCtx) {
         TitleCard_Colors = TitleCard_Colors_ori;
     }
 
-    if (DECR(titleCtx->delayTimer) == 0) {
+    if (DECR_LOGIC(titleCtx->delayTimer) == 0) {
         if (titleCtx->durationTimer == 80) {
             GameInteractor_ExecuteOnPresentTitleCard();
         }
         
-        if (DECR(titleCtx->durationTimer) == 0) {
+        if (DECR_LOGIC(titleCtx->durationTimer) == 0) {
             Math_StepToS(&titleCtx->alpha, 0, 30);
             Math_StepToS(&titleCtx->intensityR, 0, 70);
             Math_StepToS(&titleCtx->intensityG, 0, 70);
@@ -1246,7 +1246,7 @@ void Actor_Destroy(Actor* actor, PlayState* play) {
 }
 
 void func_8002D7EC(Actor* actor) {
-    f32 speedRate = R_UPDATE_RATE * 0.5f;
+    f32 speedRate = R_UPDATE_RATE * 0.5f * FPS_ADJUSTMENT;
 
     actor->world.pos.x += (actor->velocity.x * speedRate) + actor->colChkInfo.displacement.x;
     actor->world.pos.y += (actor->velocity.y * speedRate) + actor->colChkInfo.displacement.y;
@@ -1257,7 +1257,7 @@ void func_8002D868(Actor* actor) {
     actor->velocity.x = Math_SinS(actor->world.rot.y) * actor->speedXZ;
     actor->velocity.z = Math_CosS(actor->world.rot.y) * actor->speedXZ;
 
-    actor->velocity.y += actor->gravity;
+    actor->velocity.y += actor->gravity * FPS_ADJUSTMENT;
     if (actor->velocity.y < actor->minVelocityY) {
         actor->velocity.y = actor->minVelocityY;
     }
@@ -2510,7 +2510,7 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
         GameInteractor_ExecuteOnSceneSpawnActors();
     }
 
-    if (actorCtx->unk_02 != 0) {
+    if (actorCtx->unk_02 != 0 && gIsLogicFrame) {
         actorCtx->unk_02--;
     }
 
@@ -2586,7 +2586,7 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
                     }
 
                     Actor_SetObjectDependency(play, actor);
-                    if (actor->colorFilterTimer != 0) {
+                    if (actor->colorFilterTimer != 0 && gIsLogicFrame) {
                         actor->colorFilterTimer--;
                     }
                     actor->update(actor, play);
@@ -2620,7 +2620,9 @@ void Actor_UpdateAll(PlayState* play, ActorContext* actorCtx) {
         }
     }
 
-    func_8002C7BC(&actorCtx->targetCtx, player, actor, play);
+    if (gIsLogicFrame) {
+        func_8002C7BC(&actorCtx->targetCtx, player, actor, play); // TODO
+    }
     TitleCard_Update(play, &actorCtx->titleCtx);
     DynaPoly_UpdateBgActorTransforms(play, &play->colCtx.dyna);
 }
